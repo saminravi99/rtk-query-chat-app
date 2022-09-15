@@ -19,7 +19,7 @@ export const conversationsApi = apiSlice.injectEndpoints({
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
       ) {
         // create socket
-        const socket = io("http://localhost:9000", {
+        const socket = io(`${process.env.REACT_APP_API_URL}`, {
           reconnectionDelay: 1000,
           reconnection: true,
           reconnectionAttemps: 10,
@@ -32,6 +32,9 @@ export const conversationsApi = apiSlice.injectEndpoints({
         try {
           await cacheDataLoaded;
           socket.on("conversation", (data) => {
+            const loggedInUser = data.data.users.find(
+              (user) => user?.email == arg
+            );
             updateCachedData((draft) => {
               const conversation = draft.data.find(
                 (c) => c.id == data?.data?.id
@@ -40,8 +43,13 @@ export const conversationsApi = apiSlice.injectEndpoints({
               if (conversation?.id) {
                 conversation.message = data?.data?.message;
                 conversation.timestamp = data?.data?.timestamp;
+                draft.data.sort((a, b) => b.timestamp - a.timestamp);
               } else {
-                // do nothing
+                //pessimistic update for conversations through socket when new conversation is created
+                if (loggedInUser) {
+                  draft.data.push(data.data);
+                  draft.data.sort((a, b) => b.timestamp - a.timestamp);
+                }
               }
             });
           });
@@ -103,20 +111,20 @@ export const conversationsApi = apiSlice.injectEndpoints({
               timestamp: arg.data.timestamp,
             })
           ).unwrap();
+          //No need to update conversation cache pessimistically as it is already updated through socket
           // update conversations cache pessimistically start
-          dispatch(
-            apiSlice.util.updateQueryData(
-              "getConversations",
-              arg.sender,
-              (draft) => {
-
-                draft.data.push(conversation?.data);
-                draft.data.sort((a, b) => {
-                  return b.timestamp - a.timestamp;
-                });
-              }
-            )
-          );
+          //   dispatch(
+          //     apiSlice.util.updateQueryData(
+          //       "getConversations",
+          //       arg.sender,
+          //       (draft) => {
+          //         draft.data.push(conversation?.data);
+          //         draft.data.sort((a, b) => {
+          //           return b.timestamp - a.timestamp;
+          //         });
+          //       }
+          //     )
+          //   );
           // update conversations cache pessimistically end
 
           // update messages cache pessimistically start
@@ -141,7 +149,7 @@ export const conversationsApi = apiSlice.injectEndpoints({
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         // optimistic cache update start
-        const pathResult = dispatch(
+        const patchResult = dispatch(
           apiSlice.util.updateQueryData(
             "getConversations",
             arg.sender,
@@ -174,21 +182,21 @@ export const conversationsApi = apiSlice.injectEndpoints({
                 timestamp: arg.data.timestamp,
               })
             ).unwrap();
-
+            // No need to updare message cache pessimistically as it is already updated through socket
             // update messages cache pessimistically start
-            dispatch(
-              apiSlice.util.updateQueryData(
-                "getMessages",
-                res.conversationId.toString(),
-                (draft) => {
-                  draft.push(res);
-                }
-              )
-            );
+            // dispatch(
+            //   apiSlice.util.updateQueryData(
+            //     "getMessages",
+            //     res.conversationId.toString(),
+            //     (draft) => {
+            //       draft.push(res);
+            //     }
+            //   )
+            // );
             // update messages cache pessimistically end
           }
         } catch (err) {
-          pathResult.undo();
+          patchResult.undo();
         }
       },
     }),
