@@ -8,7 +8,7 @@ const baseQuery = fetchBaseQuery({
         if (token) {
             headers.set("Authorization", `Bearer ${token}`);
         }
-        if(token && endpoint === "getMessages"){
+        if(token && (endpoint === "getMessages" || endpoint === "getMoreMessages")){
             headers.set("User-Email", getState()?.auth?.user?.email);    
         }
 

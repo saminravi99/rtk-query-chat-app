@@ -6,6 +6,13 @@ export const messagesApi = apiSlice.injectEndpoints({
     getMessages: builder.query({
       query: (id) =>
         `/messages?conversationId=${id}&_sort=timestamp&_order=desc&_page=1&_limit=${process.env.REACT_APP_MESSAGES_PER_PAGE}`,
+      transformResponse(apiResponse, meta) {
+        const totalCount = meta.response.headers.get("X-Total-Count");
+        return {
+          data: apiResponse,
+          totalCount,
+        };
+      },
       async onCacheEntryAdded(
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
@@ -28,7 +35,7 @@ export const messagesApi = apiSlice.injectEndpoints({
             updateCachedData((draft) => {
               //pessimistic update for messages through socket when new message is added to conversations
               if (isConversationIdValid) {
-                draft.push(data.data);
+                draft.data.push(data.data);
               }
             });
           });
@@ -36,6 +43,32 @@ export const messagesApi = apiSlice.injectEndpoints({
 
         await cacheEntryRemoved;
         socket.close();
+      },
+    }),
+    getMoreMessages: builder.query({
+      query: ({id, page}) =>
+        `/messages?conversationId=${id}&_sort=timestamp&_order=desc&_page=${page}&_limit=${process.env.REACT_APP_MESSAGES_PER_PAGE}`,
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          if (result?.data?.length > 0) {
+            // update conversation cache pessimistically start
+            dispatch(
+              apiSlice.util.updateQueryData(
+                "getMessages",
+                arg.id.toString(),
+                (draft) => {
+                  return {
+                    data: [...draft.data, ...result.data],
+                    totalCount: Number(draft.totalCount),
+                  };
+                }
+              )
+            );
+            // update messages cache pessimistically end
+          }
+        } catch (err) {}
+
       },
     }),
     addMessage: builder.mutation({
