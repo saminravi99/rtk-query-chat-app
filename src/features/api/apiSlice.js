@@ -4,9 +4,13 @@ import { userLoggedOut } from "../auth/authSlice";
 const baseQuery = fetchBaseQuery({
     baseUrl: process.env.REACT_APP_API_URL,
     prepareHeaders: async (headers, { getState, endpoint }) => {
+        // console.log(endpoint);
         const token = getState()?.auth?.accessToken;
         if (token) {
             headers.set("Authorization", `Bearer ${token}`);
+        }
+        if(token && endpoint === "getMessages"){
+            headers.set("User-Email", getState()?.auth?.user?.email);    
         }
 
         return headers;
