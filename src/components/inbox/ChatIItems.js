@@ -53,7 +53,11 @@ export default function ChatItems() {
     let content = null;
 
     if (isLoading) {
-        content = <li className="m-2 text-center">Loading...</li>;
+        content = (
+          <div className="h-[calc(100vh-129px)] flex items-center justify-center">
+            <div class="w-16 h-16 border-b-2 border-gray-900 rounded-full animate-spin"></div>
+          </div>
+        );
     } else if (!isLoading && isError) {
         content = (
             <li className="m-2 text-center">
@@ -64,37 +68,44 @@ export default function ChatItems() {
         content = <li className="m-2 text-center">No conversations found!</li>;
     } else if (!isLoading && !isError && conversations?.length > 0) {
         content = (
-            <InfiniteScroll
-                dataLength={conversations.length}
-                next={fetchMore}
-                hasMore={hasMore}
-                loader={<h4>Loading...</h4>}
-                height={window.innerHeight - 129}
-            >
-                {conversations.map((conversation) => {
-                    const { id, message, timestamp } = conversation;
-                    const { email } = user || {};
-                    const { name, email: partnerEmail } = getPartnerInfo(
-                        conversation.users,
-                        email
-                    );
+          <InfiniteScroll
+            dataLength={conversations.length}
+            next={fetchMore}
+            hasMore={hasMore}
+            styles={{
+                overflow: 'hidden'
+            }}
+            loader={
+              <div className=" flex py-3 items-center justify-center">
+                <div class="w-14 h-14  border-b-2 border-gray-900 rounded-full animate-spin"></div>
+              </div>
+            }
+            height={window.innerHeight - 129}
+          >
+            {conversations.map((conversation) => {
+              const { id, message, timestamp } = conversation;
+              const { email } = user || {};
+              const { name, email: partnerEmail } = getPartnerInfo(
+                conversation.users,
+                email
+              );
 
-                    return (
-                        <li key={id}>
-                            <Link to={`/inbox/${id}`}>
-                                <ChatItem
-                                    avatar={gravatarUrl(partnerEmail, {
-                                        size: 80,
-                                    })}
-                                    name={name}
-                                    lastMessage={message}
-                                    lastTime={moment(timestamp).fromNow()}
-                                />
-                            </Link>
-                        </li>
-                    );
-                })}
-            </InfiniteScroll>
+              return (
+                <li key={id}>
+                  <Link to={`/inbox/${id}`}>
+                    <ChatItem
+                      avatar={gravatarUrl(partnerEmail, {
+                        size: 80,
+                      })}
+                      name={name}
+                      lastMessage={message}
+                      lastTime={moment(timestamp).fromNow()}
+                    />
+                  </Link>
+                </li>
+              );
+            })}
+          </InfiniteScroll>
         );
     }
 

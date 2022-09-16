@@ -8,6 +8,7 @@ import {
   useGetMessagesQuery,
 } from "../../../features/messages/messagesApi";
 import Error from "../../ui/Error";
+import Blank from "./Blank";
 import ChatHead from "./ChatHead";
 import Messages from "./Messages";
 import Options from "./Options";
@@ -22,7 +23,11 @@ export default function ChatBody() {
   let content = null;
 
   if (isLoading) {
-    content = <div>Loading...</div>;
+    content = (
+      <div className="h-[calc(100vh-10px)] flex items-center justify-center">
+        <div class="w-16 h-16 border-b-2 border-gray-900 rounded-full animate-spin"></div>
+      </div>
+    );
   } else if (!isLoading && isError) {
     content = (
       <div>
@@ -30,7 +35,7 @@ export default function ChatBody() {
       </div>
     );
   } else if (!isLoading && !isError && messages?.length === 0) {
-    content = <div>No messages found!</div>;
+    content = <Blank/>;
   } else if (!isLoading && !isError && messages?.length > 0) {
     content = (
       <>

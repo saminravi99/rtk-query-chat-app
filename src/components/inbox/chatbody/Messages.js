@@ -42,33 +42,40 @@ export default function Messages({ messages = [], totalCount = 0 }) {
   }, [totalCount, page]);
 
   return (
-    <div
-      id="scrollable-div"
-      className="relative w-full h-[calc(100vh-197px)] p-6 overflow-y-auto flex flex-col-reverse"
-    >
-      <ul className="space-y-2">
+    <>
+      <div
+        id="scrollable-div"
+        className="relative w-full h-[calc(100vh-197px)] p-6 overflow-y-auto flex flex-col-reverse"
+      >
         <InfiniteScroll
           dataLength={messages.length}
           next={fetchMore}
           inverse={true}
           hasMore={hasMore}
+          style={{ display: "flex", flexDirection: "column-reverse", overflow: "hidden" }}
           scrollableTarget="scrollable-div"
-          loader={<h4>Loading...</h4>}
+          loader={
+            <div className=" flex items-center justify-center">
+              <div class="w-16 h-16  border-b-2 border-gray-900 rounded-full animate-spin"></div>
+            </div>
+          }
         >
-          {messages
-            .slice()
-            .sort((a, b) => a.timestamp - b.timestamp)
-            .map((message) => {
-              const { message: lastMessage, id, sender } = message || {};
+          <ul className="space-y-2">
+            {messages
+              .slice()
+              .sort((a, b) => a.timestamp - b.timestamp)
+              .map((message) => {
+                const { message: lastMessage, id, sender } = message || {};
 
-              const justify = sender.email !== email ? "start" : "end";
+                const justify = sender.email !== email ? "start" : "end";
 
-              return (
-                <Message key={id} justify={justify} message={lastMessage} />
-              );
-            })}
+                return (
+                  <Message key={id} justify={justify} message={lastMessage} />
+                );
+              })}
+          </ul>
         </InfiniteScroll>
-      </ul>
-    </div>
+      </div>
+    </>
   );
 }
