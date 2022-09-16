@@ -1,18 +1,18 @@
 {
   "files": {
     "main.css": "/static/css/main.ff6bc59c.css",
-    "main.js": "/static/js/main.4fe00835.js",
+    "main.js": "/static/js/main.93068ba7.js",
     "static/js/787.7ea0274a.chunk.js": "/static/js/787.7ea0274a.chunk.js",
     "static/media/lws-logo-dark.svg": "/static/media/lws-logo-dark.70a060d2626bd1c9398edde22f1bd0d8.svg",
     "static/media/lws-logo-light.svg": "/static/media/lws-logo-light.05c1a2a307370057e8995bda49d4495d.svg",
     "static/media/blank.svg": "/static/media/blank.7069ea26fb6aa3f58f5f52782ae37f02.svg",
     "index.html": "/index.html",
     "main.ff6bc59c.css.map": "/static/css/main.ff6bc59c.css.map",
-    "main.4fe00835.js.map": "/static/js/main.4fe00835.js.map",
+    "main.93068ba7.js.map": "/static/js/main.93068ba7.js.map",
     "787.7ea0274a.chunk.js.map": "/static/js/787.7ea0274a.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.ff6bc59c.css",
-    "static/js/main.4fe00835.js"
+    "static/js/main.93068ba7.js"
   ]
 }
