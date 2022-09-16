@@ -47,7 +47,7 @@ export const messagesApi = apiSlice.injectEndpoints({
     }),
     getMoreMessages: builder.query({
       query: ({id, page}) =>
-        `/messages?conversationId=${id}&_sort=timestamp&_order=desc&_page=${page}&_limit=${process.env.REACT_APP_MESSAGES_PER_PAGE}`,
+        `/messages?conversationId=${id}&_sort=timestamp&_order=desc&_page=${page}&_limit=${process.env.REACT_APP_MORE_MESSAGES_PER_PAGE}`,
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
