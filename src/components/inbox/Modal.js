@@ -34,7 +34,6 @@ export default function Modal({ open, control }) {
 
   useEffect(() => {
     if (participant?.length > 0 && participant[0].email !== myEmail) {
-
       // check conversation existance
       dispatch(
         conversationsApi.endpoints.getConversation.initiate({
@@ -54,6 +53,7 @@ export default function Modal({ open, control }) {
 
   useEffect(() => {
     if (isAddConversationSuccess && addConversationData) {
+
       navigate(`/inbox/${addConversationData?.id}`);
     }
   }, [addConversationData, isAddConversationSuccess]);
@@ -61,9 +61,8 @@ export default function Modal({ open, control }) {
   // listen conversation add/edit success
   useEffect(() => {
     if (isAddConversationSuccess || isEditConversationSuccess) {
-      control();
       setMessage("");
-      setTo("")
+      setTo("");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAddConversationSuccess, isEditConversationSuccess]);
@@ -90,7 +89,6 @@ export default function Modal({ open, control }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
 
     if (conversation?.length > 0) {
       // edit conversation
@@ -106,6 +104,8 @@ export default function Modal({ open, control }) {
       })
         .unwrap()
         .then(() => {
+          control();
+
           setUserCheck(false);
           navigate(`/inbox/${conversation[0].id}`);
         });
@@ -120,6 +120,8 @@ export default function Modal({ open, control }) {
           timestamp: new Date().getTime(),
         },
       });
+      control();
+
       setUserCheck(false);
     }
   };
