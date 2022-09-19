@@ -87,7 +87,6 @@ export const conversationsApi = apiSlice.injectEndpoints({
     getConversation: builder.query({
       query: ({ userEmail, participantEmail }) =>
         `/conversations?participants_like=${userEmail}-${participantEmail}&&participants_like=${participantEmail}-${userEmail}`,
-        providesTags: ["GetConversation"],
     }),
     addConversation: builder.mutation({
       query: ({ sender, data }) => ({
@@ -95,7 +94,6 @@ export const conversationsApi = apiSlice.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["GetConversation"],
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         const conversation = await queryFulfilled;
         if (conversation?.data?.id) {
@@ -149,7 +147,6 @@ export const conversationsApi = apiSlice.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["GetConversation"],
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         // optimistic cache update start
         const patchResult = dispatch(
