@@ -121,11 +121,10 @@ export default function Modal({ open, control }) {
       })
         .unwrap()
         .then(() => {
-          control();
-
           setUserCheck(false);
           navigate(`/inbox/${conversation[0].id}`);
         });
+      control();
     } else if (conversation?.length === 0) {
       // add conversation
       addConversation({
