@@ -63,12 +63,6 @@ export default function Modal({ open, control }) {
     }
   }, [participant, dispatch, myEmail, to]);
 
-  useEffect(() => {
-    if (isAddConversationSuccess && addConversationData) {
-      navigate(`/inbox/${addConversationData?.id}`);
-    }
-  }, [addConversationData, isAddConversationSuccess]);
-
   useDispatch(() => {
     if (isAddConversationError || isEditConversationError) {
       setMessage(backup);
