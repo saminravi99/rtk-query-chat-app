@@ -27,6 +27,6 @@ export const apiSlice = createApi({
         }
         return result;
     },
-    tagTypes: [],
+    tagTypes: ["GetConversation"],
     endpoints: (builder) => ({}),
 });
