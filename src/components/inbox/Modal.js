@@ -14,6 +14,7 @@ export default function Modal({ open, control }) {
   const navigate = useNavigate();
   const [to, setTo] = useState("");
   const [message, setMessage] = useState("");
+  const [backup, setBackup] = useState("");
   const [userCheck, setUserCheck] = useState(false);
   const { user: loggedInUser } = useSelector((state) => state.auth) || {};
   const { email: myEmail } = loggedInUser || {};
@@ -27,10 +28,21 @@ export default function Modal({ open, control }) {
 
   const [
     addConversation,
-    { data: addConversationData, isSuccess: isAddConversationSuccess },
+    {
+      data: addConversationData,
+      isSuccess: isAddConversationSuccess,
+      isError: isAddConversationError,
+      isLoading: isAddConversationLoading,
+    },
   ] = useAddConversationMutation();
-  const [editConversation, { isSuccess: isEditConversationSuccess }] =
-    useEditConversationMutation();
+  const [
+    editConversation,
+    {
+      isSuccess: isEditConversationSuccess,
+      isError: isEditConversationError,
+      isLoading: isEditConversationLoading,
+    },
+  ] = useEditConversationMutation();
 
   useEffect(() => {
     if (participant?.length > 0 && participant[0].email !== myEmail) {
@@ -53,16 +65,21 @@ export default function Modal({ open, control }) {
 
   useEffect(() => {
     if (isAddConversationSuccess && addConversationData) {
-
       navigate(`/inbox/${addConversationData?.id}`);
     }
   }, [addConversationData, isAddConversationSuccess]);
 
+  useDispatch(() => {
+    if (isAddConversationError || isEditConversationError) {
+      setMessage(backup);
+    }
+  }, [isAddConversationError, isEditConversationError]);
+
   // listen conversation add/edit success
   useEffect(() => {
     if (isAddConversationSuccess || isEditConversationSuccess) {
-      setMessage("");
       setTo("");
+      setBackup("");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAddConversationSuccess, isEditConversationSuccess]);
@@ -124,6 +141,7 @@ export default function Modal({ open, control }) {
 
       setUserCheck(false);
     }
+    setMessage("");
   };
 
   return (
@@ -165,7 +183,10 @@ export default function Modal({ open, control }) {
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-violet-500 focus:border-violet-500 focus:z-10 sm:text-sm"
                   placeholder="Message"
                   value={message}
-                  onChange={(e) => setMessage(e.target.value)}
+                  onChange={(e) => {
+                    setMessage(e.target.value);
+                    setBackup(e.target.value);
+                  }}
                 />
               </div>
             </div>
@@ -176,7 +197,10 @@ export default function Modal({ open, control }) {
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
                 disabled={
                   conversation === undefined ||
-                  (participant?.length > 0 && participant[0].email === myEmail)
+                  (participant?.length > 0 &&
+                    participant[0].email === myEmail) ||
+                  isAddConversationLoading ||
+                  isEditConversationLoading
                 }
               >
                 Send Message
